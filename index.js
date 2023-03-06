@@ -8,6 +8,61 @@ const operate = {
     "+": (a, b) => a + b,
     "-": (a, b) => a - b,
 };
+const ISOPERATOR = (op) =>
+    op === "+" || op === "-" || op === "*" || op === "÷" || op === ".";
+const ISPAREN = (op) => op === "(" || op === ")";
+
+const isValidCalculus = (splited) => {
+    const stack = [];
+    for (let i = 0; i < splited.length; i++) {
+        // 1. 연산자(+,-,*,÷,.)가 연속으로 2개가 들어가 있는지 확인
+        if (
+            i < splited.length - 1 &&
+            ISOPERATOR(splited[i]) &&
+            ISOPERATOR(splited[i + 1])
+        ) {
+            alert(
+                "올바른 계산식이 아닙니다. 연산자가 연속으로 포함되어 있습니다."
+            );
+            return false;
+        }
+        // 2. 연산자의 앞과 뒤에 숫자가 있는지 확인
+        if (ISOPERATOR(splited[i])) {
+            if (i === 0 || i == splited.length - 1) {
+                alert(
+                    "올바른 계산식이 아닙니다. 연산자는 계산식에 처음이나 끝에 위치할 수 없습니다."
+                );
+                return false;
+            } else if (
+                ISOPERATOR(splited[i - 1]) ||
+                ISPAREN(splited[i - 1]) ||
+                ISOPERATOR(splited[i + 1]) ||
+                ISPAREN(splited[i + 1])
+            ) {
+                alert(
+                    "올바른 계산식이 아닙니다. 연산자의 앞과 뒤에는 반드시 숫자 또는 괄호식이 존재해야 합니다."
+                );
+                return false;
+            }
+        }
+        // 3. 괄호가 열려 있는지 확인
+        if (ISPAREN(splited[i])) {
+            if (stack[stack.length - 1] === "(" && splited[i] === ")")
+                stack.pop();
+            else stack.push(splited[i]);
+        }
+        // 4. 0으로 나누는지 확인
+        if (splited[i] === "0" && splited[i - 1] === "÷") {
+            alert("올바른 계산식이 아닙니다. 0으로 나눌 수 없습니다.");
+            return false;
+        }
+    }
+    if (stack.length) {
+        alert("올바른 계산식이 아닙니다. 괄호가 열려있습니다.");
+        return false;
+    }
+    return true;
+};
 
 const preprocessing = (exp) => {
     const splited = [];
@@ -74,7 +129,8 @@ document.addEventListener("keydown", (e) => {
             .querySelector(`input[value="="]`)
             .dispatchEvent(new Event("click"));
     } else if (shiftKey && (key === "(" || key === ")")) {
-        equationBox.innerHTML += key;
+        if (equationBox.innerHTML === "0") equationBox.innerHTML = key;
+        else equationBox.innerHTML += key;
     }
 });
 
@@ -100,14 +156,14 @@ document.querySelector(".delete").addEventListener("click", (e) => {
 
 document.querySelector(".calculate").addEventListener("click", (e) => {
     const exp = equationBox.innerHTML;
-    // 숫자와 연산자로 분리함.
+    // 1. 숫자와 연산자로 분리함.
     const splited = preprocessing(exp.split(""));
-    // 계산식이 맞는지 확인함.
-    // 1. 연산자(+,-,*,÷,.)가 연속으로 2개가 들어가 있는지 확인
-    // 2. 괄호가 열려 있는지 확인
-    // 3. 0으로 나누는지 확인
-    // 계산함.
+    // 2. 계산식이 맞는지 확인함.
+    if (!isValidCalculus(splited)) return;
+    // 3. 계산함.
     const res = calc(splited);
+    resultBox.innerHTML = res;
+    // 4. history에 기록함.
     const newRecord = document.createElement("div");
     newRecord.className = "record";
     newRecord.appendChild(document.createElement("hr"));
@@ -115,8 +171,4 @@ document.querySelector(".calculate").addEventListener("click", (e) => {
     newRecord.appendChild(document.createElement("br"));
     newRecord.appendChild(document.createTextNode(res));
     document.querySelector(".history").appendChild(newRecord);
-    resultBox.innerHTML = res;
 });
-
-// 4+(10-2/2)*(5+2) == 67
-// 5*(2+7*2)/4+(10/2+8) == 33
