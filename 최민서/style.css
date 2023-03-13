@@ -1,0 +1,111 @@
+html {
+    background: rgb(179, 155, 254);
+    background: linear-gradient(150deg, rgba(179, 155, 254, 1) 0%, rgba(140, 0, 161, 1) 100%);
+}
+
+html,
+body {
+    position: relative;
+    top: 5%;
+    left: 10%;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    display: flex;
+    width: 640px;
+    height: 600px;
+}
+
+.cal {
+    align-items: center;
+    justify-content: center;
+    width: 320px;
+    height: 600px;
+}
+
+.cal-header {
+    display: block;
+    padding: 20px;
+    height: 60px;
+    text-align: end;
+    word-break: break-all;
+    background-color: rgba(0, 0, 0, .62);
+    color: white;
+}
+
+.cal-body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 80px);
+    margin-top: -4px;
+    background-color: white;
+    width: 100%;
+    gap: 4px;
+}
+
+.cal-header .cal-previous-preview {
+    opacity: .7;
+    font-size: 14px;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.cal-header .cal-current-preview {
+    font-size: 25px;
+    height: 30px;
+}
+
+.cal-body>button {
+    border: none;
+    align-items: center;
+    justify-items: center;
+    background-color: rgb(250 241 255);
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cal-body .all-clear {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+.cal-body .operation {
+    grid-column-start: 4;
+    grid-column-end: 5;
+}
+
+.cal-body .clear, .cal-body .equal {
+    grid-column-start: 3;
+    grid-column-end: 5;
+}
+
+@media (min-width: 601px) {
+    .cal-body>button:hover {
+        background-color: white;
+    }
+}
+
+.history {
+    display: flex;
+    flex-direction: column-reverse;
+    position: relative;
+    text-align: end;
+    line-height: 160%;
+    width: 320px;
+    height: 600px;
+    padding-right: 12px;
+    padding-left: 12px;
+    margin-left: 2px;
+    background-color: white;
+    overflow: auto;
+}
