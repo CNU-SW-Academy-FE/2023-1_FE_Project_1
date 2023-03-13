@@ -1,8 +1,12 @@
 console.clear();
 
+// 계산기 작업 수행
 class Calculator {
     $previousPreview;
     $currentPreview;
+    previousOperand = ''
+    operation = ''
+    currentOperand = ''
 
     constructor($previousPreview, $currentPreview) {
         this.$previousPreview = $previousPreview
@@ -10,55 +14,125 @@ class Calculator {
     }
 
     onPressNumber(number) {
-        console.log('이전 수 : ' + (this.$previousPreview.textContent ? this.$previousPreview.textContent : 0))
-
         if (number === '.') {
-            if (this.this.$previousPreview.textContent < 1 || this.$previousPreview.textContent.includes('.'))
+            if (this.currentOperand === '' || this.currentOperand === '0') {
+                this.currentOperand = '0.'
+                this.$currentPreview.textContent = this.currentOperand
+                this.$previousPreview.textContent = this.previousOperand + ' ' + this.operation + ' ' + this.currentOperand
                 return
+            }
+            else if (this.currentOperand < 1 || this.$previousPreview.textContent.includes('.')) {
+                return
+            }
+        }
+        if (number === '0') {
+            if (this.currentOperand > 0 && !this.currentOperand.includes('.')) {
+                return
+            }
         }
 
-        this.$currentPreview.textContent += number
+        this.currentOperand += number
+        this.$currentPreview.textContent = this.currentOperand
+        this.$previousPreview.textContent = this.previousOperand + ' ' + this.operation + ' ' + this.currentOperand
+
         console.log('현재 수 : ' + this.$currentPreview.textContent)
     }
 
-    onPressOperation(operation) {
-        console.log(operation)
+    handleMinus(a, b) {
+        return Number(a) - Number(b)
     }
 
-    handleMinus() {
-
+    handlePlus(a, b) {
+        return Number(a) + Number(b)
     }
 
-    handlePlus() {
-
+    handleMultiply(a, b) {
+        return Number(a) * Number(b)
     }
 
-    handleMultiply() {
-
-    }
-
-    handleDevide() {
-
+    handleDivide(a, b) {
+        if (b === '0') { return NaN}
+        return Number(a) / Number(b)
     }
 
     onEqual() {
-
+        let result;
+        switch (this.operation) {
+            case '+':
+                result = this.handlePlus(this.previousOperand, this.currentOperand)
+                this.$previousPreview.textContent = ''
+                this.$currentPreview.textContent = result
+                this.previousOperand = ''
+                this.currentOperand = '' + result 
+                this.operation = ''
+                break
+            case '-':
+                result = this.handleMinus(this.previousOperand, this.currentOperand)
+                this.$previousPreview.textContent = ''
+                this.$currentPreview.textContent = result
+                this.previousOperand = ''
+                this.currentOperand = '' + result
+                this.operation = ''
+                break
+            case '*':
+                result = this.handleMultiply(this.previousOperand, this.currentOperand)
+                this.$previousPreview.textContent = ''
+                this.$currentPreview.textContent = result
+                this.previousOperand = ''
+                this.currentOperand = '' + result
+                this.operation = ''
+                break
+            case '÷':
+                result = this.handleDivide(this.previousOperand, this.currentOperand)
+                this.$previousPreview.textContent = ''
+                this.$currentPreview.textContent = result
+                this.previousOperand = ''
+                this.currentOperand = '' + result
+                this.operation = ''
+                break
+            default:
+                break
+        }
     }
 
     onDelete() {
-
+        const str = this.currentOperand
+        if (str.length === 0) { return }
+        else if (str.length === 1) {
+            this.currentOperand = '0'
+            if (this.previousOperand === '') { this.operation = '' }
+        } else {
+            this.currentOperand = str.substring(0, str.length - 1)
+        }
+        console.log(this.currentOperand)
+        this.$currentPreview.textContent = this.currentOperand
+        this.$previousPreview.textContent = this.previousOperand + ' ' + this.operation + ' ' + this.currentOperand
     }
 
     onReset() {
-
+        this.$previousPreview.textContent = ''
+        this.$currentPreview.textContent = ''
+        this.previousOperand = ''
+        this.currentOperand = ''
+        this.operation = ''
+        console.log("reset")
     }
 
-    appendOperation(item) {
-        console.log(item)
+    appendOperation(operation) {
+        if (operation === '=') {
+            this.onEqual()
+            return
+        }
+        this.previousOperand = this.currentOperand
+        this.currentOperand = ''
+        this.operation = operation
+        this.$previousPreview.textContent = this.previousOperand + ' ' + this.operation + ' '
+        this.$currentPreview.textContent = ''
     }
 
 }
 
+// DOM 제어 변수 선언
 const $previousPreview = document.querySelector("[data-previous-preview]");
 
 const $currentPreview = document.querySelector("[data-current-preview]");
@@ -77,6 +151,8 @@ const $operations = document.querySelectorAll("[data-btn-operation]");
 
 const calculator = new Calculator($previousPreview, $currentPreview)
 
+
+// 이벤트 처리
 $numbers.forEach((item) => {
     item.addEventListener("click", (e) => {
         const number = e.target.textContent
@@ -88,19 +164,19 @@ $operations.forEach((item) => {
     item.addEventListener("click", (e) => {
         switch (item) {
             case $minus:
-                calculator.appendOperation(item.textContent)
+                calculator.appendOperation(e.target.textContent)
                 break
             case $plus:
-                calculator.appendOperation()
+                calculator.appendOperation(e.target.textContent)
                 break
             case $multiply:
-                calculator.appendOperation()
+                calculator.appendOperation(e.target.textContent)
                 break
             case $divide:
-                calculator.appendOperation()
+                calculator.appendOperation(e.target.textContent)
                 break
             case $equal:
-                calculator.appendOperation()
+                calculator.appendOperation(e.target.textContent)
                 break
             default:
 
@@ -110,6 +186,9 @@ $operations.forEach((item) => {
         // calculator.onPressOperation(operation)
     })
 })
+
+$reset.addEventListener('click', (e) => calculator.onReset())
+$delete.addEventListener('click', (e) => calculator.onDelete())
 
 // console.log($currentPreview)
 // console.log($previousPreview)
