@@ -1,6 +1,8 @@
 class Calculator{
     elPreviousPreview;
     elCurrentPreview;
+    previousOperand;
+    currentOperand;
     constructor(elPreviousPreview,elCurrentPreview) {
         this.elCurrentPreview = elCurrentPreview;
         this.elPreviousPreview = elPreviousPreview;
@@ -8,7 +10,6 @@ class Calculator{
 
     onPressNumber(number){
         this.elPreviousPreview.textContent = this.elCurrentPreview.textContent
-        console.log(this.elPreviousPreview.textContent)
         if(number === '.') {
             if(this.elCurrentPreview.textContent.length < 1 || 
                 this.elCurrentPreview.textContent.includes('.')
@@ -17,7 +18,6 @@ class Calculator{
                 } 
         }
         this.elCurrentPreview.textContent += number
-        console.log(this.elCurrentPreview.textContent)
     }
 
     handleMinus(){
@@ -39,12 +39,17 @@ class Calculator{
 
     }
     onReset(){
-
+        this.elPreviousPreview.textContent = '';
+        this.elCurrentPreview.textContent = '';
+        this.previousOperand.textContent = '';
+        this.currentOperand.textContent = '';
     }
-    appendOperation(){
-
+    appendOperation(oper){
+        this.previousOperand = oper
+        this.elCurrentPreview.textContent += oper
     }
 }
+
 
 
 const elPreviousPreview = document.querySelector("[data-previous-preview]");
@@ -77,19 +82,19 @@ elOperaters.forEach((operater) =>{
     operater.addEventListener('click', (e) => {
         switch(operater){
             case elMinus:
-                cal.appendOperation()
+                cal.appendOperation(e.target.textContent)
                 break;
             case elPlus:
-                cal.appendOperation()
+                cal.appendOperation(e.target.textContent)
                 break;
             case elMultiply:
-                cal.appendOperation()
+                cal.appendOperation(e.target.textContent)
                 break;
             case elDivide:
-                cal.appendOperation()
+                cal.appendOperation(e.target.textContent)
                 break;
             case elEqual:
-                cal.appendOperation()
+                cal.appendOperation(e.target.textContent)
                 break;
             default:
                 break;
@@ -97,3 +102,5 @@ elOperaters.forEach((operater) =>{
         
     })
 })
+
+elReset.addEventListener('click', () => cal.onReset())
